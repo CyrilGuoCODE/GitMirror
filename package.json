@@ -1,0 +1,31 @@
+{
+  "name": "gitmirror",
+  "version": "1.0.0",
+  "description": "多平台Git仓库同步工具",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "nodemon server/index.js",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "node server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "git",
+    "mirror",
+    "sync",
+    "repository"
+  ],
+  "author": "",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "nodemon": "^3.1.9",
+    "simple-git": "^3.27.0",
+    "winston": "^3.17.0"
+  }
+}
