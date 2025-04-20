@@ -4,9 +4,27 @@ const path = require('path');
 const dotenv = require('dotenv');
 const { setupRoutes } = require('./routes');
 const { logger } = require('./utils/logger');
+const { ensureDataFilesExist } = require('./utils/dataStore');
+const { migrateRepositoriesFromConfig } = require('./utils/migrationHelper');
 
 // 加载环境变量
 dotenv.config();
+
+// 初始化数据
+async function initializeApplication() {
+  try {
+    // 确保数据文件存在
+    await ensureDataFilesExist();
+    
+    // 迁移旧版仓库数据
+    await migrateRepositoriesFromConfig();
+    
+    // 日志记录
+    logger.info('应用初始化完成');
+  } catch (error) {
+    logger.error(`应用初始化失败: ${error.message}`);
+  }
+}
 
 // 创建Express应用
 const app = express();
@@ -40,9 +58,11 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// 启动服务器
-app.listen(PORT, () => {
-  logger.info(`服务器运行在端口 ${PORT}`);
-  logger.info(`环境: ${process.env.NODE_ENV || 'development'}`);
-  logger.info('GitMirror 服务已启动');
+// 初始化应用并启动服务器
+initializeApplication().then(() => {
+  app.listen(PORT, () => {
+    logger.info(`服务器运行在端口 ${PORT}`);
+    logger.info(`环境: ${process.env.NODE_ENV || 'development'}`);
+    logger.info('GitMirror 服务已启动');
+  });
 }); 

@@ -1,15 +1,27 @@
 [
   {
-    "id": "source-test-platform-test-test-repo",
+    "id": "mirror-gitee-cyrilguo-git-mirror",
+    "type": "mirror",
+    "platform": "gitee",
+    "repo": "cyrilguo/git-mirror",
+    "branches": [
+      "main",
+      "master"
+    ],
+    "status": "syncing",
+    "createdAt": "2025-04-20T08:16:07.002Z",
+    "statusUpdatedAt": "2025-04-20T08:18:51.145Z",
+    "updatedAt": "2025-04-20T08:18:51.145Z"
+  },
+  {
+    "id": "source-github-CyrilGuoCODE-GitMirror",
     "type": "source",
-    "platform": "test-platform",
-    "repo": "test/test-repo",
+    "platform": "github",
+    "repo": "CyrilGuoCODE/GitMirror",
     "branches": [
       "main"
     ],
-    "status": "failed",
-    "createdAt": "2025-04-20T06:57:39.398Z",
-    "statusUpdatedAt": "2025-04-20T07:27:23.295Z",
-    "updatedAt": "2025-04-20T07:27:23.296Z"
+    "status": "idle",
+    "createdAt": "2025-04-20T08:18:47.443Z"
   }
 ]

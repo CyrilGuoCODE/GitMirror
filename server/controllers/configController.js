@@ -9,7 +9,18 @@ const { configStore, platformStore, repositoryStore, ensureDataFilesExist } = re
 async function getSyncConfig(req, res) {
   try {
     const config = await configStore.get();
-    res.json(config);
+    
+    // 确保返回的配置不包含仓库信息
+    // 如果配置中存在旧的sources或mirrors字段，将其过滤掉
+    const sanitizedConfig = {
+      auto_sync: config.auto_sync,
+      sync_interval: config.sync_interval,
+      conflict_strategy: config.conflict_strategy,
+      log_level: config.log_level,
+      log_retention_days: config.log_retention_days
+    };
+    
+    res.json(sanitizedConfig);
   } catch (error) {
     logger.error(`获取配置失败: ${error.message}`);
     res.status(500).json({ error: '获取配置失败', details: error.message });
@@ -28,35 +39,47 @@ async function updateSyncConfig(req, res) {
       return res.status(400).json({ error: '无效的配置格式' });
     }
     
+    // 创建一个新的配置对象，只包含允许的配置字段
+    const sanitizedConfig = {
+      auto_sync: newConfig.auto_sync,
+      sync_interval: newConfig.sync_interval,
+      conflict_strategy: newConfig.conflict_strategy,
+      log_level: newConfig.log_level,
+      log_retention_days: newConfig.log_retention_days
+    };
+    
     // 验证特定字段类型
-    if (newConfig.auto_sync !== undefined && typeof newConfig.auto_sync !== 'boolean') {
+    if (sanitizedConfig.auto_sync !== undefined && typeof sanitizedConfig.auto_sync !== 'boolean') {
       return res.status(400).json({ error: 'auto_sync 必须是布尔值' });
     }
     
-    if (newConfig.sync_interval !== undefined && (typeof newConfig.sync_interval !== 'number' || newConfig.sync_interval < 60)) {
+    if (sanitizedConfig.sync_interval !== undefined && (typeof sanitizedConfig.sync_interval !== 'number' || sanitizedConfig.sync_interval < 60)) {
       return res.status(400).json({ error: 'sync_interval 必须是大于60的数字（秒）' });
     }
     
-    if (newConfig.conflict_strategy !== undefined && 
-        !['prefer_source', 'prefer_destination', 'manual'].includes(newConfig.conflict_strategy)) {
+    if (sanitizedConfig.conflict_strategy !== undefined && 
+        !['prefer_source', 'prefer_destination', 'manual'].includes(sanitizedConfig.conflict_strategy)) {
       return res.status(400).json({ error: 'conflict_strategy 必须是以下之一: prefer_source, prefer_destination, manual' });
     }
     
-    if (newConfig.log_level !== undefined && 
-        !['error', 'warn', 'info', 'debug'].includes(newConfig.log_level)) {
+    if (sanitizedConfig.log_level !== undefined && 
+        !['error', 'warn', 'info', 'debug'].includes(sanitizedConfig.log_level)) {
       return res.status(400).json({ error: 'log_level 必须是以下之一: error, warn, info, debug' });
     }
     
-    if (newConfig.log_retention_days !== undefined && 
-        (typeof newConfig.log_retention_days !== 'number' || newConfig.log_retention_days < 1)) {
+    if (sanitizedConfig.log_retention_days !== undefined && 
+        (typeof sanitizedConfig.log_retention_days !== 'number' || sanitizedConfig.log_retention_days < 1)) {
       return res.status(400).json({ error: 'log_retention_days 必须是大于0的整数' });
     }
     
     // 更新配置
-    const updatedConfig = await configStore.update(newConfig);
+    const updatedConfig = await configStore.update(sanitizedConfig);
     
     logger.info('配置已更新');
-    res.json(updatedConfig);
+    res.json({
+      success: true,
+      ...updatedConfig
+    });
   } catch (error) {
     logger.error(`更新配置失败: ${error.message}`);
     res.status(500).json({ error: '更新配置失败', details: error.message });
@@ -79,7 +102,17 @@ async function resetConfig(req, res) {
     const newConfig = await configStore.update(defaultConfig);
     
     logger.info('配置已重置为默认值');
-    res.json({ success: true, message: '配置已重置为默认值', config: newConfig });
+    res.json({ 
+      success: true, 
+      message: '配置已重置为默认值', 
+      config: {
+        auto_sync: newConfig.auto_sync,
+        sync_interval: newConfig.sync_interval,
+        conflict_strategy: newConfig.conflict_strategy,
+        log_level: newConfig.log_level,
+        log_retention_days: newConfig.log_retention_days
+      }
+    });
   } catch (error) {
     logger.error(`重置配置失败: ${error.message}`);
     res.status(500).json({ error: '重置配置失败', details: error.message });

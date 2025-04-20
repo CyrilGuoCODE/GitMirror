@@ -8,9 +8,9 @@
     "tokenUrl": "https://github.com/settings/tokens",
     "icon": "github",
     "token": "",
-    "status": "active",
+    "status": "inactive",
     "isBuiltIn": true,
-    "updatedAt": "2025-04-20T07:26:27.761Z"
+    "updatedAt": "2025-04-20T08:18:08.365Z"
   },
   {
     "id": "gitee",
@@ -22,7 +22,8 @@
     "icon": "gitee",
     "token": "",
     "status": "inactive",
-    "isBuiltIn": true
+    "isBuiltIn": true,
+    "updatedAt": "2025-04-20T08:17:14.086Z"
   },
   {
     "id": "gitlab",

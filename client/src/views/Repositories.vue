@@ -267,27 +267,11 @@ const deleteRepository = async () => {
   deletingRepo.value = true;
   
   try {
-    // 获取当前配置
-    const config = { ...configStore.config };
+    // 使用repositoryStore直接删除仓库
+    const result = await repositoryStore.deleteRepository(repoToDelete.value.id);
     
-    // 根据类型从配置中移除仓库
-    if (repoToDelete.value.type === 'source' && config.sources) {
-      config.sources = config.sources.filter(
-        source => !(source.platform === repoToDelete.value.platform && source.repo === repoToDelete.value.repo)
-      );
-    } else if (repoToDelete.value.type === 'mirror' && config.mirrors) {
-      config.mirrors = config.mirrors.filter(
-        mirror => !(mirror.platform === repoToDelete.value.platform && mirror.repo === repoToDelete.value.repo)
-      );
-    }
-    
-    // 更新配置
-    const success = await configStore.updateConfig(config);
-    
-    if (success) {
+    if (result.success) {
       ElMessage.success('仓库已删除');
-      // 重新获取仓库列表
-      await repositoryStore.fetchRepositories();
     } else {
       ElMessage.error('删除仓库失败');
     }
@@ -308,41 +292,22 @@ const addRepository = async () => {
     savingRepo.value = true;
     
     try {
-      // 获取当前配置
-      const config = { ...configStore.config };
-      
-      // 准备新仓库对象
-      const repo = {
+      // 准备仓库数据
+      const repoData = {
+        type: newRepo.type,
         platform: newRepo.platform,
-        repo: newRepo.repo
+        repo: newRepo.repo,
+        branches: newRepo.type === 'source' ? newRepo.branches : undefined
       };
       
-      // 根据类型添加到配置
-      if (newRepo.type === 'source') {
-        if (!config.sources) config.sources = [];
-        
-        // 添加分支（如果有）
-        if (newRepo.branches && newRepo.branches.length > 0) {
-          repo.branches = newRepo.branches;
-        }
-        
-        config.sources.push(repo);
-      } else {
-        if (!config.mirrors) config.mirrors = [];
-        config.mirrors.push(repo);
-      }
+      // 使用repositoryStore添加仓库
+      const result = await repositoryStore.addRepository(repoData);
       
-      // 更新配置
-      const success = await configStore.updateConfig(config);
-      
-      if (success) {
+      if (result.success) {
         ElMessage.success('仓库添加成功');
         addRepoDialogVisible.value = false;
-        
-        // 重新获取仓库列表
-        await repositoryStore.fetchRepositories();
       } else {
-        ElMessage.error('添加仓库失败');
+        ElMessage.error(result.error || '添加仓库失败');
       }
     } catch (error) {
       console.error('Failed to add repository:', error);
@@ -360,9 +325,6 @@ onMounted(async () => {
   try {
     // 获取平台列表
     await platformStore.fetchPlatforms();
-    
-    // 获取配置
-    await configStore.fetchConfig();
     
     // 获取仓库列表
     await repositoryStore.fetchRepositories();

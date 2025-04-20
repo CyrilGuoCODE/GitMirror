@@ -110,6 +110,51 @@ export const useRepositoryStore = defineStore('repository', {
       
       // 开始轮询
       setTimeout(poll, pollInterval);
+    },
+    
+    // 添加仓库方法
+    async addRepository(repoData) {
+      this.loading = true;
+      this.error = null;
+      
+      try {
+        const response = await axios.post('/api/repos', repoData);
+        
+        // 添加到本地仓库列表
+        this.repositories.push(response.data);
+        
+        return { success: true, data: response.data };
+      } catch (error) {
+        this.error = error.response?.data?.error || '添加仓库失败';
+        console.error('Error adding repository:', error);
+        return { success: false, error: this.error };
+      } finally {
+        this.loading = false;
+      }
+    },
+    
+    // 删除仓库方法
+    async deleteRepository(repoId) {
+      this.loading = true;
+      this.error = null;
+      
+      try {
+        await axios.delete(`/api/repos/${repoId}`);
+        
+        // 从本地仓库列表移除
+        const index = this.repositories.findIndex(repo => repo.id === repoId);
+        if (index !== -1) {
+          this.repositories.splice(index, 1);
+        }
+        
+        return { success: true };
+      } catch (error) {
+        this.error = error.response?.data?.error || '删除仓库失败';
+        console.error('Error deleting repository:', error);
+        return { success: false, error: this.error };
+      } finally {
+        this.loading = false;
+      }
     }
   }
 }); 

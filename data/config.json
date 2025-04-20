@@ -5,26 +5,6 @@
   "log_level": "info",
   "log_retention_days": 30,
   "sources": [
-    {
-      "platform": "gitee",
-      "repo": "gavincfm/architect-all",
-      "branches": [
-        "master"
-      ]
-    },
-    {
-      "platform": "gitee",
-      "repo": "gavincfm/architect-all",
-      "branches": [
-        "master"
-      ]
-    },
-    {
-      "platform": "gitee",
-      "repo": "gavincfm/architect-all",
-      "branches": [
-        "master"
-      ]
-    }
+
   ]
 }
