@@ -1,0 +1,15 @@
+[
+  {
+    "id": "source-test-platform-test-test-repo",
+    "type": "source",
+    "platform": "test-platform",
+    "repo": "test/test-repo",
+    "branches": [
+      "main"
+    ],
+    "status": "failed",
+    "createdAt": "2025-04-20T06:57:39.398Z",
+    "statusUpdatedAt": "2025-04-20T07:27:23.295Z",
+    "updatedAt": "2025-04-20T07:27:23.296Z"
+  }
+]
