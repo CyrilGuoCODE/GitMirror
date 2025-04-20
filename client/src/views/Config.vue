@@ -156,11 +156,7 @@ import { useConfigStore } from '../stores/config';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Check, InfoFilled, WarningFilled, Delete, RefreshRight } from '@element-plus/icons-vue';
 import axios from 'axios';
-
-// 简单深度比较函数，替代deep-equal
-const deepEqual = (obj1, obj2) => {
-  return JSON.stringify(obj1) === JSON.stringify(obj2);
-};
+import deepEqual from 'deep-equal';
 
 // 获取配置存储
 const configStore = useConfigStore();
